@@ -1,3 +1,5 @@
+import random
+
 from .pyparsing import Word
 
 
@@ -11,3 +13,8 @@ from .pyparsing import Word
 # unit = [A-Za-z]+["/"[A-Za-z]+]
 
 dummy = "This does nothing."
+
+
+def parse(phrase = None):
+    return dict(variable = "test",
+                value = random.randint(0,100))

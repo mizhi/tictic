@@ -7,7 +7,7 @@ class User(db.Model):
 class Variable(db.Model):
     user = db.ReferenceProperty(User,
                                 collection_name="variables")
-    name = db.StringPropery(required=True)
+    name = db.StringProperty(required=True)
 
 class Value(db.Model):
     variable = db.ReferenceProperty(Variable,
