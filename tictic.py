@@ -20,6 +20,12 @@ from model import Variable
 #
 class XmppHandler(xmpp_handlers.CommandHandler):
     def text_message(self, message):
+        sender = message.sender.split("/")
+        if len(sender) == 2:
+            email,clientapp = sender[0],sender[1]
+        else:
+            email,clientapp = sender[0], None
+
         message.reply("I see you as {sender}".format(sender = message.sender))
 
 ###
