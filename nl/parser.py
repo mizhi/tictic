@@ -1,20 +1,33 @@
+import logging
 import random
 
-from .pyparsing import Word
+from .pyparsing import Literal, Optional, Word, alphas, alphanums, nums
 
+logger = logging.getLogger()
 
-# update_phrase = <nl_phrase>
-# nl_phrase = [<possessive>] <variable> [<to_be>] <value> [<unit>]
-# possessive = "my"
-# variable = ([A-Za-z_][A-Za-z]+\w)+
-# to_be = "is" | "was" | "="
-# value = <number>
-# number = [0-9]+
-# unit = [A-Za-z]+["/"[A-Za-z]+]
-
-dummy = "This does nothing."
-
+#
+# Define parser
+#
+unit = Word(alphas) + Optional(Literal("/") + Word(alphas))
+value = Word(nums).setParseAction(lambda t: int(t[0]))
+to_be = Literal("is") | Literal("was") | Literal("=")
+variable = Word(alphas, alphanums + "_")
+possessive = Literal("my")
+update_phrase = Optional(possessive) + \
+                variable.setResultsName("variable") + \
+                Optional(to_be) + \
+                value.setResultsName("value") + \
+                Optional(unit).setResultsName("units")
 
 def parse(phrase = None):
-    return dict(variable = "test",
-                value = random.randint(0,100))
+    if phrase is None:
+        return None
+
+    try:
+        result = update_phrase.parseString(phrase)
+    except ParseException as e:
+        logger.debug("Bad parse for '{0}'".format(phrase))
+        return None
+
+    return dict(variable = result.variable,
+                value = result.value)
