@@ -1,7 +1,8 @@
 import logging
 import random
 
-from .pyparsing import Literal, Optional, Word, alphas, alphanums, nums
+from .pyparsing import (Literal, Optional, Word, alphas, alphanums, nums,
+                        ParseException)
 
 logger = logging.getLogger()
 
@@ -27,7 +28,7 @@ def parse(phrase = None):
         result = update_phrase.parseString(phrase)
     except ParseException as e:
         logger.debug("Bad parse for '{0}'".format(phrase))
-        return None
+        raise
 
     return dict(variable = result.variable,
                 value = result.value)

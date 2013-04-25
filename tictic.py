@@ -21,11 +21,25 @@ env = jinja2.Environment(
 
 class CheckLogin(webapp2.RequestHandler):
     def get(self):
-        self.response.write(parser.dummy)
+        self.response.write("Check login")
 
 class ViewStats(webapp2.RequestHandler):
     def get(self):
-        self.response.write("View stats")
+        google_user = users.get_current_user()
+
+        # will have already been authorized by appengine. Look up in our
+        # user database
+        appuser = User.all().filter("info =", google_user).get()
+        if not appuser:
+            # no records for this person yet, so tell them to send a message to
+            # our bot.
+            pass
+        else:
+            # look up variables
+            templ = env.get_template("view.template.html")
+            self.response.write(templ.render(
+                dict(user = appuser)
+            ))
 
 app = webapp2.WSGIApplication([('/_ah/xmpp/message/chat/', XmppHandler),
                                ('/view', ViewStats),

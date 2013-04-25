@@ -10,6 +10,7 @@ handlers:
 
 - url: /.*
   script: tictic.app
+  login: required
 
 inbound_services:
 - xmpp_message

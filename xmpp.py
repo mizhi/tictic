@@ -2,8 +2,9 @@ from functools import wraps
 import inspect
 import logging
 
-from google.appengine.api import xmpp
+from google.appengine.api import xmpp, users
 from google.appengine.ext.webapp import xmpp_handlers
+
 
 from model import User, Variable, Value
 from nl import parser
@@ -35,15 +36,20 @@ class XmppHandler(xmpp_handlers.CommandHandler):
     def forget_command(self, message = None):
         email = extract_email(message.sender)
 
-        user = User.all().filter("email = ", email).get()
+        try:
+            sender = users.User(email)
+        except users.UserNotFoundError as e:
+            message.reply("You don't seem to have an account that I can find.")
 
-        if user:
-            message.reply("Okay, I'm forgetting you, {sender}.".format(sender = email))
+        appuser = User.all().filter("info = ", sender).get()
+
+        if appuser:
+            message.reply("Okay, I'm forgetting you, {sender}.".format(sender = sender.email()))
             for variable in user.variables:
                 for value in variable.values:
                     value.delete()
                 variable.delete()
-            user.delete()
+            appuser.delete()
         else:
             message.reply("I don't know you.")
 
@@ -62,20 +68,30 @@ class XmppHandler(xmpp_handlers.CommandHandler):
     def text_message(self, message):
         email = extract_email(message.sender)
 
-        user = User.all().filter("email = ", email).get()
+        try:
+            sender = users.User(email)
+        except users.UserNotFoundError as e:
+            message.reply("You don't seem to have an account that I can find.")
 
-        if not user:
-            user = User(email = email)
-            user.put()
+        appuser = User.all().filter("info = ", sender).get()
 
-        datum = parser.parse(message.body)
+        if not appuser:
+            appuser = User(info = sender)
+            appuser.put()
 
-        variable = Variable(name = datum["variable"], user = user)
-        variable.put()
+        try:
+            datum = parser.parse(message.body)
 
-        value = Value(value = datum["value"], variable = variable)
-        value.put()
+            variable = Variable.all().filter("name = ", datum["variable"]).get()
+            if not variable:
+                variable = Variable(name = datum["variable"], user = appuser)
+                variable.put()
 
-        message.reply("I've logged variable {variable} as being {value}".format(sender = email,
-                                                                                variable = datum["variable"],
-                                                                                value = datum["value"]))
+            value = Value(value = datum["value"], variable = variable)
+            value.put()
+
+            message.reply("I've logged variable {variable} as being {value}".format(sender = email,
+                                                                                    variable = datum["variable"],
+                                                                                    value = datum["value"]))
+        except parser.ParseException as e:
+            message.reply("I couldn't understand you. (Message was: {msg})".format(msg = e.message))
