@@ -1,0 +1,12 @@
+{% extends "base.template.html" %}
+{% block title %}I do not know you.{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="message">
+  I don't know you {{ user.nickname()|title|replace(".", " ") }}. Send a text message
+  to <a href="xmpp://seggytictic@appspot.com">seggytictic@appspot.com</a>
+</div>
+{% endblock %}

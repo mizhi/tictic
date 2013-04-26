@@ -81,17 +81,17 @@ class XmppHandler(xmpp_handlers.CommandHandler):
 
         try:
             datum = parser.parse(message.body)
-
-            variable = Variable.all().filter("name = ", datum["variable"]).get()
-            if not variable:
-                variable = Variable(name = datum["variable"], user = appuser)
-                variable.put()
-
-            value = Value(value = datum["value"], variable = variable)
-            value.put()
-
-            message.reply("I've logged variable {variable} as being {value}".format(sender = email,
-                                                                                    variable = datum["variable"],
-                                                                                    value = datum["value"]))
         except parser.ParseException as e:
             message.reply("I couldn't understand you. (Message was: {msg})".format(msg = e.message))
+
+        variable = Variable.all().filter("name = ", datum["variable"]).get()
+        if not variable:
+            variable = Variable(name = datum["variable"], user = appuser)
+            variable.put()
+
+        value = Value(value = datum["value"], variable = variable)
+        value.put()
+
+        message.reply("I've logged variable {variable} as being {value}".format(sender = email,
+                                                                                variable = datum["variable"],
+                                                                                value = datum["value"]))

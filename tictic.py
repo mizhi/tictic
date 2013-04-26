@@ -19,10 +19,6 @@ env = jinja2.Environment(
         os.path.join(os.path.dirname(__file__),
                      "templates")))
 
-class CheckLogin(webapp2.RequestHandler):
-    def get(self):
-        self.response.write("Check login")
-
 class ViewStats(webapp2.RequestHandler):
     def get(self):
         google_user = users.get_current_user()
@@ -33,7 +29,10 @@ class ViewStats(webapp2.RequestHandler):
         if not appuser:
             # no records for this person yet, so tell them to send a message to
             # our bot.
-            pass
+            templ = env.get_template("fail.template.html")
+            self.response.write(templ.render(
+                dict(user = google_user)
+            ))
         else:
             # look up variables
             templ = env.get_template("view.template.html")
@@ -42,6 +41,5 @@ class ViewStats(webapp2.RequestHandler):
             ))
 
 app = webapp2.WSGIApplication([('/_ah/xmpp/message/chat/', XmppHandler),
-                               ('/view', ViewStats),
-                               ('/', CheckLogin)],
+                               ('/', ViewStats)],
                               debug=True)

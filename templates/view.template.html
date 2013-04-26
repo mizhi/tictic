@@ -1,0 +1,55 @@
+{% extends "base.template.html" %}
+{% block title %} Viewing tictic stats{% endblock %}
+{% block head %}
+  {{ super() }}
+  <script src="/static/js/flot/jquery.flot.js"></script>
+  <script src="/static/js/flot/jquery.flot.time.js"></script>
+  <script src="/static/js/main.js"></script>
+
+  <script>
+    $(document).ready(
+      function() {
+        {% for variable in user.variables %}
+        var outer_div = $("<div></div>").addClass("plot_container").
+          appendTo("#plots");
+
+        var new_h1 = $("<h1/>").text("{{ variable.name }}").
+          appendTo(outer_div);
+
+        var plot_name = "plot_{{ variable.name }}";
+        var new_div = $("<div></div>").attr("id", plot_name).
+          addClass("plot").appendTo(outer_div)
+
+        var values = [
+          {% for value in variable.values.order("logged_at") %}
+            [new Date("{{ value.logged_at }}").getTime() * 1000, {{ value.value }}],
+          {% endfor %}
+        ];
+
+        $.plot($("#" + plot_name),
+          [
+           {data: values,
+            points: { show: true },
+            lines: {show: true}
+           }
+          ],
+          { xaxis: {
+            mode: "time",
+            timeformat: "%H%M%S",
+            label: "{{ variable.name }}"
+          },
+            yaxis: {
+              min: 0
+            }
+          });
+        {% endfor %}
+      }
+    );
+    </script>
+{% endblock %}
+
+{% block content %}
+  <h1>Recorded stats for {{ user.info.nickname()|title|replace(".", " ") }}</h1>
+
+  <div id="plots"></div>
+{% endblock %}

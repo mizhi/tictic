@@ -1,0 +1,5 @@
+indexes:
+- kind: Value
+  properties:
+  - name: variable
+  - name: logged_at

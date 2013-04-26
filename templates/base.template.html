@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head lang="en">
+    <meta charset="utf-8" />
+
+    {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="/static/css/reset.css" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <script src="/static/js/jquery-2.0.0.js"></script>
+    {% endblock %}
+
+  </head>
+
+  <body>
+    <div id="content">
+      {% block content %}
+
+      {% endblock %}
+    </div>
+  </body>
+</html>
