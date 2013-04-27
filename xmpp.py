@@ -1,3 +1,5 @@
+# Copyright (c) - 2013 Mitchell Peabody.
+# See COPYRIGHT.txt and LICENSE.txt in the root of this project.
 from functools import wraps
 import inspect
 import logging

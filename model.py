@@ -1,3 +1,6 @@
+# Copyright (c) - 2013 Mitchell Peabody.
+# See COPYRIGHT.txt and LICENSE.txt in the root of this project.
+
 # google datastore apis
 from google.appengine.ext import db
 
